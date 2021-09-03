@@ -95,46 +95,16 @@ class Home extends Component {
     let image_path = this.image.value
     let token = localStorage.getItem('token')
     let id = this.state.id
-    console.log(id);
-    if (id !== ""){
-      Axios.post(url + "category/save/", {
-        id,
-        name,
-        slug,
-        description,
-        image_path
-    }, {
-      headers: {
-        'Authorization': `Token ${token}` 
-      }
-    })
-        .catch((err) => {
-            console.log(err.response);
-        })
-        .then((res) => {
-            if (res === undefined) {
-                console.log('no response');
-            }
-            else {
-                alert('Edit Successful!')
-                this.setState({openModal: false,id:"" })
-                Axios.get(url + "categories")
-                .then((res) => {
-                  // console.log(res.data.data.product_service)
-                  this.setState({ data: res.data.data.product_service })
-                })
-            }
-        })
+    let body = {}
+    if (id === ""){
+      body = {name,slug,description,image_path}
     }
-    else if (name === '' || slug === '' || description === '' || image_path === '') {
+    else {body = {id,name,slug,description,image_path}}
+    console.log(id);
+    if (name === '' || slug === '' || description === '' || image_path === '') {
       alert('Fill in all the forms')
     } else {
-      Axios.post(url + "category/save/", {
-          name,
-          slug,
-          description,
-          image_path
-      }, {
+      Axios.post(url + "category/save/",body, {
         headers: {
           'Authorization': `Token ${token}` 
         }
@@ -158,13 +128,7 @@ class Home extends Component {
           })
     }
   }
-
-  ngetes = (id) => {
-    return(
-      console.log(id)
-    )
-  }
-
+  
   render() {
     return (
       <div>
