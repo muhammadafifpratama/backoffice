@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Axios from 'axios'
-import Tes from "../component/list"
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -11,18 +10,12 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from 'reacts
 import { url } from "../helper/API_URL"
 
 class Home extends Component {
-  state = { data: [], openModal: false }
+  state = { data: [], openModal: false, id:""}
   async componentDidMount() {
     const product = await Axios.get(url + "categories")
     const promo = await Axios.get(url + "promos")
     // console.log(promo.data.data.promo_service);
     this.setState({ data: product.data.data.product_service })
-  }
-
-  renderproduk = () => {
-    return (
-      <Tes></Tes>
-    )
   }
 
   data = () => {
@@ -35,7 +28,7 @@ class Home extends Component {
             <TableCell align="right">{val.created_date}</TableCell>
             <TableCell align="right">{val.description}</TableCell>
             <TableCell align="right">{val.image_path}</TableCell>
-            {/* <TableCell align="right"><Button>edit</Button></TableCell> */}
+            <TableCell align="right"><Button onClick={() => this.setState({ openModal: true, id: val.id })}>edit</Button></TableCell>
           </TableRow>
         </TableBody>
       )
@@ -51,16 +44,24 @@ class Home extends Component {
           <TableCell align="right">tanggal dibuat</TableCell>
           <TableCell align="right">Description</TableCell>
           <TableCell align="right">filepath</TableCell>
-          {/* <TableCell align="right">actions</TableCell> */}
+          <TableCell align="right">actions</TableCell>
         </TableRow>
       </TableHead>
     )
   }
 
   modal = () => {
+    let id = this.state.id
+    let header = ""
+    if (id !== ""){
+      header = "Edit category"
+    }
+    else{
+      header = "Add New Category"
+    }
     return (
       <Modal isOpen={this.state.openModal}>
-        <ModalHeader>Add New Category</ModalHeader>
+        <ModalHeader>{header}</ModalHeader>
         <ModalBody>
           <Label>
             Name
@@ -78,13 +79,9 @@ class Home extends Component {
             Image URL
           </Label>
           <Input type='text' innerRef={(image) => this.image = image} />
-          {/* <Label>
-            id
-          </Label>
-          <Input type='text' innerRef={(id) => this.id = id} /> */}
         </ModalBody>
         <ModalFooter>
-          <Button color="secondary" onClick={() => this.setState({ openModal: false })}>Cancel</Button>
+          <Button color="secondary" onClick={() => this.setState({ openModal: false, id:"" })}>Cancel</Button>
           <Button color="primary" onClick={() => this.add()}>Confirm</Button>
         </ModalFooter>
       </Modal>
@@ -97,12 +94,42 @@ class Home extends Component {
     let description = this.desc.value
     let image_path = this.image.value
     let token = localStorage.getItem('token')
-    // let id  =  this.id.value
-    if (name === '' || slug === '' || description === '' || image_path === '') {
+    let id = this.state.id
+    console.log(id);
+    if (id !== ""){
+      Axios.post(url + "category/save/", {
+        id,
+        name,
+        slug,
+        description,
+        image_path
+    }, {
+      headers: {
+        'Authorization': `Token ${token}` 
+      }
+    })
+        .catch((err) => {
+            console.log(err.response);
+        })
+        .then((res) => {
+            if (res === undefined) {
+                console.log('no response');
+            }
+            else {
+                alert('Edit Successful!')
+                this.setState({openModal: false,id:"" })
+                Axios.get(url + "categories")
+                .then((res) => {
+                  // console.log(res.data.data.product_service)
+                  this.setState({ data: res.data.data.product_service })
+                })
+            }
+        })
+    }
+    else if (name === '' || slug === '' || description === '' || image_path === '') {
       alert('Fill in all the forms')
     } else {
       Axios.post(url + "category/save/", {
-          // id,
           name,
           slug,
           description,
@@ -122,9 +149,20 @@ class Home extends Component {
               else {
                   alert('Add Successful!')
                   this.setState({openModal: false })
+                  Axios.get(url + "categories")
+                  .then((res) => {
+                    // console.log(res.data.data.product_service)
+                    this.setState({ data: res.data.data.product_service })
+                  })
               }
           })
     }
+  }
+
+  ngetes = (id) => {
+    return(
+      console.log(id)
+    )
   }
 
   render() {

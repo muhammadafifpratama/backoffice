@@ -2,15 +2,12 @@ import React, { Component } from "react"
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
-import {Redirect} from 'react-router-dom'
+import { Redirect } from "react-router-dom";
 import Axios from "axios"
 import {url} from "../helper/API_URL"
 
 class Loginpage extends Component {
-    state = {
-        error: false,
-        redirect: false
-    }
+    state = {redirect: false}
 
     loginUser = () => {
         let username = this.username.value
@@ -20,12 +17,12 @@ class Loginpage extends Component {
         if (username === '' || password === '') {
             alert('Fill in all the forms')
         } else {
-            Axios.post(url + "login", {
+            Axios.post(url + "login/", {
                 username,
                 password
             })
                 .catch((err) => {
-                    console.log(err.response);
+                    alert(err.response.status + err.response.statusText);
                 })
                 .then((res) => {
                     if (res === undefined) {
@@ -34,6 +31,7 @@ class Loginpage extends Component {
                     else {
                         console.log(res.data.token);
                         localStorage.setItem('token', res.data.token)
+                        this.setState({ redirect: true });
                     }
                 })
         }
