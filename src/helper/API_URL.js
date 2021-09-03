@@ -1,0 +1,1 @@
+export const url = "https://api.temandapur.com/api/v1/"

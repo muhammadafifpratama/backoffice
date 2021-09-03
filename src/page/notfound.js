@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 
-class User extends Component {
+class Notfound extends Component {
     state = {  }
     render() { 
         return ( <div>
-            ini user
+            salah ketik url
         </div> );
     }
 }
  
-export default User;
+export default Notfound;

@@ -8,12 +8,14 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { Button } from '@material-ui/core';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Input, Label } from 'reactstrap';
+import { url } from "../helper/API_URL"
 
 class Home extends Component {
-  state = { data: [], openModal: false}
+  state = { data: [], openModal: false }
   async componentDidMount() {
-    const product = await Axios.get("https://api.temandapur.com/api/v1/categories/")
-    //console.log(product.data.data.product_service);
+    const product = await Axios.get(url + "categories")
+    const promo = await Axios.get(url + "promos")
+    // console.log(promo.data.data.promo_service);
     this.setState({ data: product.data.data.product_service })
   }
 
@@ -33,6 +35,7 @@ class Home extends Component {
             <TableCell align="right">{val.created_date}</TableCell>
             <TableCell align="right">{val.description}</TableCell>
             <TableCell align="right">{val.image_path}</TableCell>
+            {/* <TableCell align="right"><Button>edit</Button></TableCell> */}
           </TableRow>
         </TableBody>
       )
@@ -48,47 +51,91 @@ class Home extends Component {
           <TableCell align="right">tanggal dibuat</TableCell>
           <TableCell align="right">Description</TableCell>
           <TableCell align="right">filepath</TableCell>
+          {/* <TableCell align="right">actions</TableCell> */}
         </TableRow>
       </TableHead>
     )
   }
 
-  add = () => {
+  modal = () => {
     return (
       <Modal isOpen={this.state.openModal}>
-      <ModalHeader>Add New Category</ModalHeader>
-      <ModalBody>
+        <ModalHeader>Add New Category</ModalHeader>
+        <ModalBody>
           <Label>
-              Name
+            Name
           </Label>
           <Input type='text' innerRef={(nama) => this.nama = nama} />
           <Label>
-              Description
+            Slug
+          </Label>
+          <Input type='text' innerRef={(slug) => this.slug = slug} />
+          <Label>
+            Description
           </Label>
           <Input type='text' innerRef={(desc) => this.desc = desc} />
           <Label>
-              Image URL
+            Image URL
           </Label>
           <Input type='text' innerRef={(image) => this.image = image} />
-      </ModalBody>
-      <ModalFooter>
+          {/* <Label>
+            id
+          </Label>
+          <Input type='text' innerRef={(id) => this.id = id} /> */}
+        </ModalBody>
+        <ModalFooter>
           <Button color="secondary" onClick={() => this.setState({ openModal: false })}>Cancel</Button>
-          <Button color="primary" onClick={() => console.log(this.nama.value + this.desc.value + this.image.value)}>Confirm</Button>
-      </ModalFooter>
-  </Modal>
+          <Button color="primary" onClick={() => this.add()}>Confirm</Button>
+        </ModalFooter>
+      </Modal>
     )
   }
 
+  add = () => {
+    let name = this.nama.value
+    let slug = this.slug.value
+    let description = this.desc.value
+    let image_path = this.image.value
+    let token = localStorage.getItem('token')
+    // let id  =  this.id.value
+    if (name === '' || slug === '' || description === '' || image_path === '') {
+      alert('Fill in all the forms')
+    } else {
+      Axios.post(url + "category/save/", {
+          // id,
+          name,
+          slug,
+          description,
+          image_path
+      }, {
+        headers: {
+          'Authorization': `Token ${token}` 
+        }
+      })
+          .catch((err) => {
+              console.log(err.response);
+          })
+          .then((res) => {
+              if (res === undefined) {
+                  console.log('no response');
+              }
+              else {
+                  alert('Add Successful!')
+                  this.setState({openModal: false })
+              }
+          })
+    }
+  }
+
   render() {
-    console.log(this.state.data);
     return (
       <div>
-        {this.add()}
         <Table>
-            {this.header()}
-            {this.data()}
+          {this.header()}
+          {this.data()}
         </Table>
         <Button onClick={() => this.setState({ openModal: true })}>add</Button>
+        {this.modal()}
       </div >
     );
   }

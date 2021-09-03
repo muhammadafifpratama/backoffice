@@ -5,11 +5,12 @@ import tes from './page/tes'
 import list from "./component/list"
 import navbar from "./component/navbar"
 import sidebar from "./component/drawer"
-import listing from "./component/productlisting"
 import table from "./component/table"
-import user from "./page/user"
+import cat from "./page/categories"
 import voucher from "./page/voucher"
 import product from "./page/product"
+import login from "./page/login"
+import notfound from "./page/notfound"
 
 class App extends Component{
   render(){
@@ -21,11 +22,12 @@ class App extends Component{
           <Route path="/list" component={list}/>
           <Route path="/nav" component={navbar}/>
           <Route path="/bar" component={sidebar}/>
-          <Route path="/user" component={user}/>
+          <Route path="/cat" component={cat}/>
           <Route path="/product" component={product}/>
           <Route path="/voucher" component={voucher}/>
-          <Route path="/listing" component={listing}/>
-          <Route path="/table" component={table}/>
+          <Route path="/table" component={table}/> 
+          <Route path="/login" component={login}/> 
+          <Route path="*" component={notfound}/> 
         </Switch>
       </div>
     )
